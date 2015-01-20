@@ -1,0 +1,40 @@
+@(title: String, scripts:Html = Html("../../public"), activeMenu: String)(content: Html)
+
+@menu_bar_scripts = {
+  @scripts
+}
+
+
+@main(title, menu_bar_scripts) {
+
+      <div id="wrapper">
+          <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+          <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+              <a href="@routes.Application.index()">ADATBÁZIS GYAK</a>
+
+            </li>
+            <li>
+              <a class="@if(activeMenu == controllers.Application.INDEX_MENU) {active}" href="@routes.Application.index()">Kezdőoldal</a>
+            </li>
+            <li>
+              <a class="@if(activeMenu == controllers.Drivers.DRIVERS_MENU) {active}" href="@routes.Drivers.showDrivers()"> Sofőrök</a>
+            </li>
+            <li>
+              <a class="@if(activeMenu == controllers.Trucks.TRUCKS_MENU) {active}" href="@routes.Trucks.showTrucks()">Gépjárművek</a>
+            </li>
+          </ul>
+        </div>
+          <!-- /#sidebar-wrapper -->
+
+          <!-- Page Content -->
+        <div id="page-content-wrapper">
+          <div class="container-fluid">
+            @content
+          </div>
+        </div>
+          <!-- /#page-content-wrapper -->
+
+      </div>
+}

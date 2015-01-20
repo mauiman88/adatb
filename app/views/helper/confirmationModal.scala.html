@@ -1,0 +1,15 @@
+@(angularFunction: String, msg: String)
+
+<div id="confirmModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="label" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                @msg
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                <button class="btn btn-primary" ng-click="@angularFunction">Igen</button>
+            </div>
+        </div>
+    </div>
+</div>

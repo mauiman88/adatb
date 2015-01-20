@@ -1,0 +1,17 @@
+@(countryVar: String, cityVar: String, streetVar: String, streetNumberVar: String, e1: String, e2: String, e3: String, e4: String, addressVar: String)
+
+    <div class="form-group ng-scope {{ @e1 ? 'has-error':'' }}">
+        <label class="col-sm-3 control-label">Ország</label>
+        <div class="col-sm-8">
+            <input id="countryId2" ng-model="@countryVar" type="text" typeahead="country as country.name for country in $parent.searchForCountry($viewValue)" typeahead-input-formatter="$parent.getCountryFormatter(@addressVar)" typeahead-loading="loadingLocations" class="form-control">
+        </div>
+    </div>
+
+    <div class="form-group ng-scope {{ @e2 ? 'has-error':'' }}">
+        <label class="col-sm-3 control-label">Város</label>
+        <div class="col-sm-8 form-control-wrapper">
+            <input id="cityId2" ng-model="@cityVar" type="text" typeahead="city as $parent.getCityLabel(city) for city in $parent.searchForCity($viewValue)" typeahead-input-formatter="$parent.getCityFormatter(@addressVar)" typeahead-loading="loadingLocations" class="form-control">
+        </div>
+    </div>
+    @helper.textInput("street2","text", "Utca", streetVar, e3)
+    @helper.textInput("streetNumber2" ,"text", "Házszám", streetNumberVar, e4)

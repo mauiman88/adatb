@@ -1,0 +1,117 @@
+@(activeMenu: String)
+
+@scripts = {
+    @helper.javascriptRouter("jsRouter")(
+        controllers.routes.javascript.Drivers.getDrivers,
+        controllers.routes.javascript.Drivers.saveDriver,
+        controllers.routes.javascript.Drivers.deleteDriver
+    )
+
+    <script type="application/javascript">
+        app.controller('DriverCtrl', function($scope){
+            console.log("he");
+
+            $scope.drivers = {};
+            $scope.getDrivers = function() {
+                jsRouter.controllers.Drivers.getDrivers()
+                .ajax({
+                    method: 'GET',
+                    cache: false,
+                    success: function(data){
+                        $scope.$apply(function() {
+                            $scope.drivers = data;
+                        })
+                    }
+                })
+            };
+            $scope.getDrivers();
+
+
+            $scope.saveDriver = function() {
+                $scope.errors = {};
+                jsRouter.controllers.Drivers.saveDriver()
+                .ajax({
+                    cache: false,
+                    method: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: $scope.selectedDriver.id,
+                        name: $scope.selectedDriver.name,
+                        phoneNumber: $scope.selectedDriver.phoneNumber,
+                        totalKilometers: $scope.selectedDriver.totalKilometers,
+                        since: $scope.selectedDriver.since,
+                        languages: $scope.selectedDriver.languages,
+                        countries: $scope.selectedDriver.countries
+                    }),
+                    success: function(data) {
+                        $scope.$apply(function(){
+                            $('#driverModal' ).modal("hide");
+                            $scope.getDrivers();
+                        })
+                    },
+                    error: function(res) {
+                        $scope.$apply(function(){
+                            $scope.errors = res.responseJSON;
+                        })
+                    }
+                })
+            };
+
+            $scope.deleteDriver = function() {
+                jsRouter.controllers.Drivers.deleteDriver()
+                .ajax({
+                    cache:false,
+                    method: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: $scope.toDelete
+                    }),
+                    success: function(data) {
+                        $scope.$apply(function(){
+                            $scope.getDrivers();
+                            $('#confirmModal' ).modal('hide');
+                        })
+                    }
+                })
+            };
+
+            $scope.selectDriver = function(driver) {
+                $scope.selectedDriver = driver;
+                $scope.openModal();
+            };
+
+            $scope.toDeleteSelection = function(id) {
+                $scope.toDelete = id;
+                $scope.openModalConfirm();
+            };
+            $scope.clearDriver = function() {
+                $scope.selectedDriver = {
+                    id: null,
+                    name: "",
+                    phoneNumber: "",
+                    totalKilometers: 0,
+                    since: ""
+                }
+            }
+
+            $scope.openModal = function () {
+                $('#driverModal' ).modal('show');
+            }
+            $scope.openModalConfirm = function () {
+                $('#confirmModal' ).modal('show');
+            }
+        })
+    </script>
+}
+
+@menubar("Sofőrök", scripts, activeMenu) {
+    <div ng-controller="DriverCtrl">
+
+        @views.html.helper.panelWithTable.render("Sofőrök", "clearDriver();openModal()", "#driverModal", "Új sofőr hozzáadása",
+            "Név", "Telefonszám", "Kilométer", "Tagság kezdete", "driver in drivers", "{{driver.name}}", "{{driver.phoneNumber}}",
+            "{{driver.totalKilometers}} km", "{{driver.since}}", "selectDriver(driver)", "toDeleteSelection(driver.id)", true)
+
+        @views.html.drivers.driverModal.render()
+        @views.html.helper.confirmationModal.render("deleteDriver()", "Biztosan törölni szeretné?")
+    </div>
+}

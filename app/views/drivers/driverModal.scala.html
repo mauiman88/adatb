@@ -1,0 +1,65 @@
+@()
+
+<div class="modal fade" id="driverModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" ng-if="selectedDriver.id != null" id="myModalLabel">{{selectedDriver.name}} szerkesztése</h4>
+                <h4 class="modal-title" ng-if="selectedDriver.id == null" id="myModalLabel">Sofőr hozzáadása</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" ng-submit="saveDriver()">
+                    <div class="form-group {{ errors.name ? 'has-error':'' }}">
+                        <label for="name" class="col-sm-3 control-label">Név</label>
+                        <div class="col-sm-9">
+                            <input type="text" ng-model="selectedDriver.name" class="form-control" id="name" placeholder="Név">
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.phoneNumber ? 'has-error':'' }}">
+                        <label for="phoneNumber" class="col-sm-3 control-label">Telefonszám</label>
+                        <div class="col-sm-9">
+                            <input type="text" ng-model="selectedDriver.phoneNumber" class="form-control" id="phoneNumber" placeholder="Telefonszám">
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.totalKilometers ? 'has-error':'' }}">
+                        <label for="totalkm" class="col-sm-3 control-label">Kilométer</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" ng-model="selectedDriver.totalKilometers" id="totalkm" placeholder="Eddigi kilometerek">
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.since ? 'has-error':'' }}">
+                        <label for="since" class="col-sm-3 control-label">Tagság kezdete</label>
+                        <div class="col-sm-9">
+                            <input type="datetime" class="form-control" ng-model="selectedDriver.since" id="since" placeholder="Tagság kezdete">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="languages" class="col-sm-3 control-label">Ismert nyelvek</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" ng-model="selectedDriver.languages" id="languages" placeholder="Ismert nyelvek">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="countries" class="col-sm-3 control-label">Ismert országok</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" ng-model="selectedDriver.countries" id="countries" placeholder="Ismert országok">
+                        </div>
+                    </div>
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                        <button type="submit" class="btn btn-primary">Mentés</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

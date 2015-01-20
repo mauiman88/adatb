@@ -1,0 +1,57 @@
+@()
+
+<div class="modal fade" id="truckModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" ng-if="selectedTruck.id != null" id="myModalLabel">{{selectedTruck.lpNumber}} szerkesztése</h4>
+                <h4 class="modal-title" ng-if="selectedTruck.id == null" id="myModalLabel">Gépjármű hozzáadása</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" ng-submit="saveTruck()">
+                    <div class="form-group {{ errors.lpNumber ? 'has-error':'' }}">
+                        <label for="lpNumber" class="col-sm-3 control-label">Rendszám</label>
+                        <div class="col-sm-9">
+                            <input type="text" ng-model="selectedTruck.lpNumber" class="form-control" id="lpNumber" placeholder="Rendszám">
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.truckType?'has-error':'' }}">
+                        <label for="truckType" class="col-sm-3 control-label">Típus</label>
+                        <div class="col-sm-9">
+                            <select id="truckType" class="form-control needsclick" ng-model="selectedTruck.truckType" ng-options="truckType.name for truckType in truckTypes">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.moTTestDate ? 'has-error':'' }}">
+                        <label for="moTTestDate" class="col-sm-3 control-label">Műszaki érvényesség</label>
+                        <div class="col-sm-9">
+                            <input type="datetime" class="form-control" ng-model="selectedTruck.moTTestDate" id="moTTestDate" placeholder="Műszaki érvényesség">
+                        </div>
+                    </div>
+
+                    <div class="form-group {{ errors.kgLimit ? 'has-error':'' }}">
+                        <label for="kgLimit" class="col-sm-3 control-label">Terhelhetőség</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" ng-model="selectedTruck.kgLimit" id="kgLimit" placeholder="Terhelhetőség">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="available" class="col-sm-3 control-label">Elérhető</label>
+                        <div class="col-sm-9">
+                            <input type="checkbox" ng-model="selectedTruck.available" id="available">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                        <button type="submit" class="btn btn-primary">Mentés</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

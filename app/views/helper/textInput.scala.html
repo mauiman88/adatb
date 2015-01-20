@@ -1,0 +1,11 @@
+@(id: String, inputType: String, label: String, angularVariable: String, errorsVariable: String, labelWidth: Int = 3)
+
+
+@defining(11 - labelWidth) { fieldWidth =>
+    <div class="form-group {{ @errorsVariable ? 'has-error' : '' }}">
+        <label for="@angularVariable" class="col-sm-@labelWidth control-label">@label</label>
+        <div class="col-sm-@fieldWidth">
+            <input id="@id" type="@inputType" class="form-control" ng-model="@angularVariable">
+        </div>
+    </div>
+}

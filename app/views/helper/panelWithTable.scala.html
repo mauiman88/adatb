@@ -1,0 +1,33 @@
+@(header: String, clearFunction: String, modalId: String, title: String, h1: String, h2: String, h3: String, h4: String,iteration: String, v1: String, v2: String, v3: String, v4: String, selectFunction: String, toDeleteFunction: String, removeAble: Boolean = true)
+
+<h1>@header</h1>
+<hr>
+<a class="btn btn-success" ng-click="@clearFunction" style="margin-bottom: 5px"><i class="fa fa-plus"></i> @title</a>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <th class="col1">@h1</th>
+                <th class="col2">@h2</th>
+                <th class="col3">@h3</th>
+                <th class="col4">@h4</th>
+                <th class="col5">#</th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="@iteration">
+                    <td class="col1">@v1</td>
+                    <td class="col2">@v2</td>
+                    <td class="col3">@v3</td>
+                    <td class="col4">@v4</td>
+                    <td class="col5">
+                        <a  ng-click="@selectFunction" ><i class="fa fa-edit"></i> Szerkesztés</a>
+
+                        @if(removeAble == true){
+                        <a ng-click="@toDeleteFunction" ><i class="fa fa-trash"></i> Törlés</a>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

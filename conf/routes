@@ -3,7 +3,23 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET         /                                  controllers.Application.index()
+
+# Driver
+GET         /admin/drivers                     controllers.Drivers.showDrivers()
+GET         /admin/drivers/getDrivers          controllers.Drivers.getDrivers()
+POST        /admin/drivers/saveDriver          controllers.Drivers.saveDriver()
+POST        /admin/drivers/deleteDriver        controllers.Drivers.deleteDriver()
+
+
+
+# Truck
+GET         /admin/trucks                      controllers.Trucks.showTrucks()
+GET         /admin/trucks/getTrucks            controllers.Trucks.getTrucks()
+POST        /admin/trucks/saveTruck            controllers.Trucks.saveTruck()
+POST        /admin/trucks/deleteTruck          controllers.Trucks.deleteTruck()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET         /assets/*file                      controllers.Assets.at(path="/public", file)
+
+
