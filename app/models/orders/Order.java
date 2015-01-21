@@ -4,7 +4,6 @@ import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Client;
 import models.EntityIdProvider;
-import models.address.Address;
 import play.data.validation.Constraints;
 import play.libs.Json;
 import utils.DateUtils;
@@ -37,9 +36,8 @@ public class Order extends EntityIdProvider{
 
     public Date created = new Date();
 
-    @ManyToOne
     @Constraints.Required
-    public Address address = new Address(); // hova kell vinni
+    public String address;
 
     @ManyToOne
     @Constraints.Required
@@ -71,12 +69,12 @@ public class Order extends EntityIdProvider{
                 .put("description", description)
                 .put("feedbackMsg", feedbackMsg)
                 .put("deliveredValue", delivered)
+                .put("address", address)
                 .put("delivered", delivered?"Igen":"Még nem")
                 .put("amount", amount);
         json.put("orderItem", orderItem.toJson());
         json.put("state", orderState.getName());
         json.put("client", client.toJson());
-        json.put("address", address.toJson());
         return json;
     }
 

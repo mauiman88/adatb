@@ -23,12 +23,14 @@ POST        /admin/trucks/deleteTruck          controllers.Trucks.deleteTruck()
 
 
 # Order
-GET         /admin/orders                          controllers.Orders.showOrders()
-GET         /admin/orders/getOrders                controllers.Orders.getOrders()
-POST        /admin/orders/saveOrder                controllers.Orders.saveOrder()
-POST        /admin/orders/changeState              controllers.Orders.changeState()
-POST        /admin/orders/wfsOrder                 controllers.Orders.wfsOrder()
-POST        /admin/orders/shippedOut               controllers.Orders.shippedOut()
+GET         /admin/orders                      controllers.Orders.showOrders()
+GET         /admin/orders/getOrders            controllers.Orders.getOrders()
+POST        /admin/orders/saveOrder            controllers.Orders.saveOrder()
+POST        /admin/orders/changeState          controllers.Orders.changeState()
+POST        /admin/orders/wfsOrder             controllers.Orders.wfsOrder()
+POST        /admin/orders/shippedOut           controllers.Orders.shippedOut()
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                      controllers.Assets.at(path="/public", file)

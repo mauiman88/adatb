@@ -3,7 +3,6 @@ package models.orders;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.EntityIdProvider;
-import models.address.Address;
 import play.libs.Json;
 import utils.JsonUtils;
 
@@ -46,7 +45,7 @@ public class Item extends EntityIdProvider{
     public BigDecimal weight;
 
     @ManyToOne
-    public Address fromAddress = new Address();
+    public String fromAddress;
 
     @Enumerated(value = EnumType.STRING)
     public ProductType productType;
@@ -56,7 +55,7 @@ public class Item extends EntityIdProvider{
         json.put("id", id)
                 .put("productName", productName)
                 .put("weight", weight)
-                .put("fromAddress", fromAddress.toJson());
+                .put("fromAddress", fromAddress);
         json.put("productType", productType.toJson(productType==ProductType.FRAGILE?1L:2L));
 
         return json;

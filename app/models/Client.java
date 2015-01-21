@@ -2,12 +2,10 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import models.address.Address;
 import play.data.validation.Constraints;
 import play.libs.Json;
 
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 import java.util.List;
 
 /**
@@ -15,8 +13,8 @@ import java.util.List;
  */
 @Entity
 public class Client extends EntityNameProvider {
-    @ManyToOne
-    public Address address = new Address();
+    public String address;
+
 
     @Constraints.Email
     public String email;
@@ -32,7 +30,7 @@ public class Client extends EntityNameProvider {
                 .put("email", email)
                 .put("phoneNumber", phoneNumber)
                 .put("taxNumber", taxNumber)
-                .put("address", address.toJson());
+                .put("address", address);
         return json;
     }
 

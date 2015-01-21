@@ -27,7 +27,6 @@
                             $scope.clients = data.clients;
                             $scope.productTypes = data.productTypes;
                             $scope.transporters = data.transporters;
-                            console.log($scope.wfsTrans)
                         })
                     }
                 })
@@ -42,23 +41,9 @@
                     truck: {
                         id: null
                     },
-                    address: {
-                        city: {
-                            id: null
-                        },
-                        country: {
-                            id: null
-                        },
-                        street: "",
-                        streetNumber: null
-                    },
+                    address: "",
                     orderItem: {
-                        fromAddress: {
-                            city: {},
-                            country: {},
-                            street: "",
-                            streetNumber: ""
-                        },
+                        fromAddress: "",
                         productType: {}
                     },
                     created: null,
@@ -78,6 +63,7 @@
                     delivered: false,
                 feedbackMsg: ""
                 };
+                console.log($scope.selectedOrder);
             };
             $scope.clearOrder();
 
@@ -91,15 +77,9 @@
                     contentType: 'application/json',
                     data: JSON.stringify({
                         id: $scope.selectedOrder.id,
-                        cityId: $scope.selectedOrder.client.address.city.id,
-                        countryId: $scope.selectedOrder.client.address.country.id,
-                        street: $scope.selectedOrder.client.address.street,
-                        streetNumber: $scope.selectedOrder.client.address.streetNumber,
+                        address: $scope.selectedOrder.client.address,
                         clientId: $scope.selectedOrder.client.id,
-                        cityIdFrom: $scope.selectedOrder.orderItem.fromAddress.city.id,
-                        countryIdFrom: $scope.selectedOrder.orderItem.fromAddress.country.id,
-                        streetFrom: $scope.selectedOrder.orderItem.fromAddress.street,
-                        streetNumberFrom: $scope.selectedOrder.orderItem.fromAddress.streetNumber,
+                        fromAddress: $scope.selectedOrder.orderItem.fromAddress,
                         weight: $scope.selectedOrder.orderItem.weight,
                         productTypeId: $scope.selectedOrder.orderItem.productType.id,
                         productName: $scope.selectedOrder.orderItem.productName
@@ -256,6 +236,10 @@
             $scope.downloadPDF = function(transport) {
                 window.open(jsRouter.controllers.PDFExport.deliveryLetter(transport.id ).url, '_blank');
             };
+
+            $scope.openOrderModal = function() {
+                $('#orderModal' ).modal('show');
+            }
         })
 
     </script>

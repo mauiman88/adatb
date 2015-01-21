@@ -8,8 +8,6 @@ import models.Client;
 import models.Driver;
 import models.Truck;
 import models.User;
-import models.address.City;
-import models.address.Country;
 import models.orders.Order;
 import models.orders.Item;
 import models.orders.Transport;
@@ -49,13 +47,9 @@ public class Orders extends Controller {
         public Long id;
 
         @Constraints.Required
-        public Long cityId;
+        public String address;
         @Constraints.Required
-        public Long countryId;
-        @Constraints.Required
-        public String street;
-        @Constraints.Required
-        public String streetNumber;
+        public String fromAddress;
 
         @Constraints.Required
         public Long clientId;
@@ -64,14 +58,6 @@ public class Orders extends Controller {
         public Long productTypeId;
         @Constraints.Required
         public String productName;
-        @Constraints.Required
-        public Long cityIdFrom;
-        @Constraints.Required
-        public Long countryIdFrom;
-        @Constraints.Required
-        public String streetFrom;
-        @Constraints.Required
-        public String streetNumberFrom;
         @Constraints.Required
         public BigDecimal weight;
         public Boolean delivered;
@@ -103,18 +89,10 @@ public class Orders extends Controller {
 
         if(form.delivered != null) order.delivered = form.delivered;
         if(form.feedbackMsg != null) order.feedbackMsg = form.feedbackMsg;
-        order.address.country = Ebean.find(Country.class).where().eq("id", form.countryId).findUnique();
-        order.address.city = Ebean.find(City.class).where().eq("id", form.cityId).findUnique();
-        order.address.street = form.street;
-        order.address.streetNumber = form.streetNumber;
-        order.address.save();
         order.client = Ebean.find(Client.class).where().eq("id", form.clientId).findUnique();
+        order.address = form.address;
 
-        order.orderItem.fromAddress.country = Ebean.find(Country.class).where().eq("id", form.countryIdFrom).findUnique();
-        order.orderItem.fromAddress.city = Ebean.find(City.class).where().eq("id", form.cityIdFrom).findUnique();
-        order.orderItem.fromAddress.street = form.streetFrom;
-        order.orderItem.fromAddress.streetNumber = form.streetNumberFrom;
-        order.orderItem.fromAddress.save();
+        order.orderItem.fromAddress = form.fromAddress;
         order.orderItem.weight = form.weight;
         order.orderItem.productName = form.productName;
         order.orderItem.productType = form.productTypeId.equals(1L)? Item.ProductType.FRAGILE : Item.ProductType.FLEXIBLE;
@@ -127,20 +105,18 @@ public class Orders extends Controller {
 
     public static Result getOrders() {
         ObjectNode json = Json.newObject();
-       /* User user = Application.getLocalUser();
+        User user = Application.getLocalUser();
         if(user.client == null) {
-            Transport.getOrdersTransportsByState(Order.OrderState.WAITING_FOR_SHIPPING);
-            json.put("new", JsonUtils.newArrayNode(Order.queryOrdersByState(Order.OrderState.NEW, Order.OrderState.REJECTED).stream().map(order -> order.toJson()).collect(Collectors.toList())));
-            json.put("waiting", JsonUtils.newArrayNode(Order.queryOrdersByState(Order.OrderState.WAITING_FOR_CLIENT).stream().map(order -> order.toJson()).collect(Collectors.toList())));
+
+                json.put("new", JsonUtils.newArrayNode(Order.queryOrdersByState(Order.OrderState.NEW).stream().map(order -> order.toJson()).collect(Collectors.toList())));
             json.put("verified", JsonUtils.newArrayNode(Order.queryOrdersByState((Order.OrderState.VERIFIED)).stream().map(order -> order.toJson()).collect(Collectors.toList())));
-            json.put("wfs", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.WAITING_FOR_SHIPPING).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
-            json.put("shipped", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.SHIPPED).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
-            json.put("transporters", JsonUtils.newArrayNode(Licence.getDrivers().stream().map(dt -> dt.toJson()).collect(Collectors.toList())));
+            //json.put("wfs", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.WAITING_FOR_SHIPPING).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
+            //json.put("shipped", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.SHIPPED).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
         } else {
             json.put("list", JsonUtils.newArrayNode(Order.queryClientOrders(user.client.id)
                     .stream().map(Order::toJson).collect(Collectors.toList())));
             json.put("client", user.client.toJson());
-        }*/
+        }
         json.put("clients", JsonUtils.newArrayNode(Client.all().stream().map(client -> client.toJson()).collect(Collectors.toList())));
         json.put("productTypes", Item.ProductType.productTypesAsJson());
         return ok(json);

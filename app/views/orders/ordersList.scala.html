@@ -1,6 +1,6 @@
 @(iteration: String, addAble: Boolean = true)
 @if(addAble) {
-  <a href="#" class="btn btn-success" data-toggle="modal" ng-click="clearOrder()" data-target="#orderModal" style="margin-bottom : 5px; margin-top: 10px;"><i class="fa fa-plus"></i>
+  <a class="btn btn-success"  ng-click="clearOrder();openOrderModal()"  style="margin-bottom : 5px; margin-top: 10px;"><i class="fa fa-plus"></i>
     Új megrendelés hozzáadása</a>
 }
 <div class="panel panel-default">

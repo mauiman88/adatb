@@ -1,13 +1,22 @@
 @(title: String, scripts:Html = Html("../../public"), activeMenu: String)(content: Html)
 
 @menu_bar_scripts = {
-  @scripts
+    @helper.javascriptRouter("jsRouter")(
+    )
+
+    <script type="application/javascript">
+        app.controller('MenuController', function($rootScope, $scope, $http) {
+
+        })
+     </script>
+
+     @scripts
 }
 
 
 @main(title, menu_bar_scripts) {
 
-      <div id="wrapper">
+      <div id="wrapper" ng-controller="MenuController">
           <!-- Sidebar -->
         <div id="sidebar-wrapper">
           <ul class="sidebar-nav">

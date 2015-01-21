@@ -55,8 +55,7 @@
                     }
 
                     <label class="col-sm-offset-3 col-sm-8">Szállítási cím</label>
-                    @helper.addressInputs("selectedOrder.client.address.country", "selectedOrder.client.address.city",
-                        "selectedOrder.client.address.street", "selectedOrder.client.address.streetNumber", "selectedOrder.client.address")
+                    @helper.textInput("fromAddress", "text", "Honnan", "selectedOrder.orderItem.fromAddress", "errors.fromAddress", 3)
 
 
 
@@ -77,10 +76,8 @@
                             @helper.textInput("weight", "number", "Termék súlya", "selectedOrder.orderItem.weight", "errors.weight", 3)
 
                             <label class="col-sm-offset-3 col-sm-8">Csomag felvételi cím</label>
-                            @helper.addressInputs2("selectedOrder.orderItem.fromAddress.country", "selectedOrder.orderItem.fromAddress.city",
-                                "selectedOrder.orderItem.fromAddress.street", "selectedOrder.orderItem.fromAddress.streetNumber",
-                                "errors.countryIdFrom","errors.cityIdFrom","errors.streetFrom","errors.streetNumberFrom",
-                                "selectedOrder.orderItem.fromAddress")
+                            @helper.textInput("address", "text", "Hova", "selectedOrder.address", "errors.address", 3)
+
 
                         </div>
                     </div>

@@ -2,7 +2,6 @@ package models;
 
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import models.address.Address;
 import play.libs.Json;
 import utils.DateUtils;
 
@@ -17,8 +16,7 @@ import java.util.List;
 @Entity
 public class Driver extends EntityNameProvider {
 
-    @ManyToOne
-    public Address address = new Address();
+    public String address;
 
     public String phoneNumber;
 
