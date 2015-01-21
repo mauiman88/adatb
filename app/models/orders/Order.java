@@ -1,5 +1,6 @@
 package models.orders;
 
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.Client;
 import models.EntityIdProvider;
@@ -11,6 +12,7 @@ import utils.DateUtils;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Mate on 2015.01.19..
@@ -76,5 +78,14 @@ public class Order extends EntityIdProvider{
         json.put("client", client.toJson());
         json.put("address", address.toJson());
         return json;
+    }
+
+
+    public static List<Order> queryClientOrders(Long id) {
+        return Ebean.find(Order.class).where().eq("client.id", id).findList();
+    }
+
+    public static List<Order> queryOrdersByState(OrderState ... state) {
+        return Ebean.find(Order.class).where().in("orderState", state).findList();
     }
 }

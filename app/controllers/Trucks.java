@@ -21,9 +21,7 @@ import java.util.stream.Collectors;
 
 import static play.data.Form.form;
 
-/**
- * Created by ujvaricsaba on 12/24/14.
- */
+
 @Transactional
 public class Trucks extends Controller {
 
@@ -66,6 +64,7 @@ public class Trucks extends Controller {
         truck.kgLimit = form.kgLimit;
         truck.moTTestDate = DateUtils.formatToDateFromYear(form.moTTestDate);
         truck.available = form.available;
+        //truck.truckType = form.truckType;
         truck.save();
 
         return ok();

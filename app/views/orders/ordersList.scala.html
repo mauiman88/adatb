@@ -1,0 +1,51 @@
+@(iteration: String, addAble: Boolean = true)
+@if(addAble) {
+  <a href="#" class="btn btn-success" data-toggle="modal" ng-click="clearOrder()" data-target="#orderModal" style="margin-bottom : 5px; margin-top: 10px;"><i class="fa fa-plus"></i>
+    Új megrendelés hozzáadása</a>
+}
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="list-group">
+      <a class="list-group-item" ng-click="selectOrder(order)" ng-repeat="@iteration">
+        <h4 class="list-group-item-heading">{{order.client.name}} <br /><small>{{order.created}}</small></h4>
+        <p class="list-group-item-text">{{order.orderItem.productName}}</p>
+        <p class="list-group-item-text">{{order.state}}</p>
+        <p class="list-group-item-text" ng-if="order.description != null"><i class="fa fa-exclamation-triangle"></i> {{order.description}}</p>
+          <input type="button" class="btn btn-primary pull-right" ng-click="selectOrder(order);selectState(state);" ng-if="state != order.state" value="Ok"/>
+          <select style="width : 30%;margin-right:5px" class="form-control needsclick pull-right" ng-model="state" ng-options="s for s in states"></select>
+        <button class="btn btn-primary" ng-click="selectOrder(order)" data-toggle="modal" data-target="#orderModal"><i class="fa fa-edit"></i> Szerkesztés</button>
+
+        <button class="btn btn-default" ng-if="isNew(order)" ng-click="selectOrder(order)" data-toggle="modal" data-target="#sendOutModal">
+                      <i class="fa fa-chevron-right"></i> Ügyfélre váró</button>
+        <button class="btn btn-default" ng-if="isVerified(order)" ng-click="selectOrder(order);" data-toggle="modal" data-target="#wfsModal">
+                      <i class="fa fa-chevron-right"></i> Kiszállításra vár</button>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="sendOutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 ng-if="selectedOrder.id != null" class="modal-title" id="myModalLabel">Megrendelés szerkesztése</h4>
+        <h4 ng-if="selectedOrder.id == null" class="modal-title" id="myModalLabel">Megrendelés hozzáadása</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" ng-submit="sendOutOrder(selectedOrder)">
+
+          @helper.textInput("selectedDate", "text", "Kiszállítás időpontja (YYYY-MM-DD)", "selectedOrder.selectedDate", "errors.selectedDate", 4)
+          @helper.textInput("amount", "text", "Összeg (Ft)", "selectedOrder.amount", "errors.amount", 4)
+
+          <div class="modal-footer">
+            <button type="button" ng-click="clearOrder()" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+            <button type="submit" class="btn btn-primary">Mentés</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

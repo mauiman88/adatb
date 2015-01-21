@@ -85,7 +85,6 @@
                 $scope.selectedTruck = {
                     id: null,
                     lpNumber: null,
-                    truckType: null,
                     moTTestDate: null,
                     kgLimit: null,
                     available: true
@@ -107,7 +106,7 @@
 
     <div ng-controller="TrucksController">
         @views.html.helper.panelWithTable.render("Gépjárművek", "clearTruck();openModal();", "#truckModal", "Új gépjármű hozzáadása",
-            "Rendszám", "Típus", "Műszaki érvényesség", "Terhelhetőség", "truck in trucks", "{{truck.lpNumber}}", "{{truck.truckType.name}}",
+            "Rendszám", "Típus", "Műszaki érvényesség", "Terhelhetőség", "truck in trucks", "{{truck.lpNumber}}", "{{truck.truckType}}",
             "{{truck.moTTestDate}}", "{{truck.kgLimit}} kg", "selectTruck(truck)", "toDeleteSelection(truck.id)", true)
         @views.html.helper.confirmationModal.render("deleteTruck()", "Biztosan törölni szeretné?")
         @views.html.trucks.truckModal.render()

@@ -1,0 +1,258 @@
+@(activeMenu: String)
+
+@scripts = {
+    @helper.javascriptRouter("jsRouter")(
+        controllers.routes.javascript.Orders.getOrders,
+        controllers.routes.javascript.Orders.saveOrder,
+        controllers.routes.javascript.Orders.changeState,
+        controllers.routes.javascript.Orders.sendOutOrder
+    )
+
+    <script type="application/javascript">
+        app.controller("OrderController", function($rootScope, $scope, $http) {
+
+            $scope.getOrders = function() {
+                jsRouter.controllers.Orders.getOrders()
+                .ajax({
+                    cache: false,
+                    method: "GET",
+                    success: function(data) {
+                        $scope.$apply(function(){
+                            $scope.newOrders = data.new;
+                            $scope.waitingOrders = data.waiting;
+                            $scope.verifiedOrders = data.verified;
+                            $scope.shippedOrders = data.shipped;
+                            $scope.wfsTrans = data.wfs;
+                            $scope.clients = data.clients;
+                            $scope.productTypes = data.productTypes;
+                            $scope.transporters = data.transporters;
+                            console.log($scope.wfsTrans)
+                        })
+                    }
+                })
+            }
+            $scope.getOrders();
+
+            $scope.clearOrder = function() {
+                $scope.selectedOrder = {
+                    driver: {
+                        id: null
+                    },
+                    truck: {
+                        id: null
+                    },
+                    address: {
+                        city: {
+                            id: null
+                        },
+                        country: {
+                            id: null
+                        },
+                        street: "",
+                        streetNumber: null
+                    },
+                    orderItem: {
+                        fromAddress: {
+                            city: {},
+                            country: {},
+                            street: "",
+                            streetNumber: ""
+                        },
+                        productType: {}
+                    },
+                    created: null,
+                    client: {
+                        address: {
+                            city: {
+                                id: null
+                            },
+                            country: {
+                                id: null
+                            },
+                            street: "",
+                            streetNumber: ""
+                        }
+                    },
+                    id: null,
+                    delivered: false,
+                feedbackMsg: ""
+                };
+            };
+            $scope.clearOrder();
+
+
+            $scope.saveOrder = function() {
+                $scope.errors = {};
+                jsRouter.controllers.Orders.saveOrder()
+                .ajax({
+                    cache: false,
+                    method: "POST",
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: $scope.selectedOrder.id,
+                        cityId: $scope.selectedOrder.client.address.city.id,
+                        countryId: $scope.selectedOrder.client.address.country.id,
+                        street: $scope.selectedOrder.client.address.street,
+                        streetNumber: $scope.selectedOrder.client.address.streetNumber,
+                        clientId: $scope.selectedOrder.client.id,
+                        cityIdFrom: $scope.selectedOrder.orderItem.fromAddress.city.id,
+                        countryIdFrom: $scope.selectedOrder.orderItem.fromAddress.country.id,
+                        streetFrom: $scope.selectedOrder.orderItem.fromAddress.street,
+                        streetNumberFrom: $scope.selectedOrder.orderItem.fromAddress.streetNumber,
+                        weight: $scope.selectedOrder.orderItem.weight,
+                        productTypeId: $scope.selectedOrder.orderItem.productType.id,
+                        productName: $scope.selectedOrder.orderItem.productName
+                    }),
+                    success: function(data) {
+                        $scope.$apply(function(){
+                            $('#orderModal' ).modal("hide");
+                            $scope.getOrders();
+                        })
+                    },
+                    error: function(res) {
+                        $scope.$apply(function(){
+                            $scope.errors = res.responseJSON;
+                        })
+                    }
+                })
+            };
+
+
+            $scope.fillStates = function() {
+                $scope.states =['@models.orders.Order.OrderState.NEW.getName()',
+                                '@models.orders.Order.OrderState.VERIFIED.getName()',
+                                '@models.orders.Order.OrderState.SHIPPED.getName()'];
+                $scope.state = $scope.states[0];
+            };
+            $scope.fillStates();
+
+
+            $scope.selectState = function(state) {
+                if($scope.isNew($scope.selectedOrder)) {
+                    $('#sendOutModal' ).modal('show');
+                } else {
+                    $scope.state = state ;
+                    $('#confirmModal' ).modal('show');
+                }
+            }
+
+            $scope.selectOrder = function(order) {
+                $scope.errors = {};
+                $scope.selectedOrder = order;
+                $scope.selectedOrder.client = $rootScope.getObjectById($scope.clients, $scope.selectedOrder.client.id)
+                $scope.selectedOrder.orderItem.productType = $rootScope.getObjectById($scope.productTypes, $scope.selectedOrder.orderItem.productType.id);
+                $scope.selectedOrder.transport = {
+                    driver: {
+                        id:null
+                    }
+                };
+                $scope.selectedOrder.truck = {id:null};
+            };
+
+
+            $scope.isVerified = function(order) {
+                return order.state == '@models.orders.Order.OrderState.VERIFIED.getName()';
+            }
+            $scope.isShipped = function(order) {
+                if(order != null) return order.state == '@models.orders.Order.OrderState.SHIPPED.getName()';
+
+            };
+
+            $scope.changeState = function() {
+                console.log($scope.selectedOrder);
+                jsRouter.controllers.Orders.changeState()
+                .ajax({
+                    cache: false,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        state: $scope.state,
+                        orderId: $scope.selectedOrder.id
+                    }),
+                    success: function() {
+                        $scope.$apply(function() {
+                            $scope.getOrders();
+                            $('#confirmModal' ).modal('hide');
+                        })
+                    }
+                })
+            };
+
+            $scope.sendOutOrder = function(order) {
+                $scope.errors = {};
+                jsRouter.controllers.Orders.sendOutOrder()
+                .ajax({
+                    cache: false,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        orderId: order.id,
+                        selectedDate: $scope.selectedOrder.selectedDate,
+                        amount: $scope.selectedOrder.amount
+                    }),
+                    success: function(data){
+                        $scope.$apply(function(){
+                            $scope.getOrders();
+                            $('#sendOutModal' ).modal('hide');
+                        })
+                    },
+                    error: function(res) {
+                        $scope.$apply(function() {
+                            $scope.errors = res.responseJSON;
+                            console.log(res.responseJSON);
+                        })
+                    }
+                })
+            };
+
+            $scope.wfsOrder = function() {
+                $scope.errors = {};
+                console.log($scope.selectedOrder.transport.driver);
+                jsRouter.controllers.Orders.wfsOrder()
+                .ajax({
+                    cache: false,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: $scope.selectedOrder.id,
+                        driverId: $scope.selectedOrder.transport.driver.id,
+                        truckId: $scope.selectedOrder.truck.id
+                    }),
+                    success: function(data) {
+                        $scope.$apply(function() {
+                            $scope.getOrders();
+                            $('#wfsModal' ).modal('hide');
+                        })
+                    },
+                    error: function(res) {
+                        $scope.$apply(function() {
+                            $scope.errors = res.responseJSON;
+                        })
+                    }
+                })
+            };
+
+            $scope.shippedOut = function(id) {
+                jsRouter.controllers.Orders.shippedOut()
+                .ajax({
+                    cache: false,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        transportId: id
+                    }),
+                    success: function(data){
+                        $scope.$apply(function(){
+                            $scope.getOrders();
+                        })
+                    }
+                })
+            };
+
+            $scope.downloadPDF = function(transport) {
+                window.open(jsRouter.controllers.PDFExport.deliveryLetter(transport.id ).url, '_blank');
+            };
+        })
+
+    </script>
+}

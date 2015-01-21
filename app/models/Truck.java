@@ -50,6 +50,7 @@ public class Truck extends EntityIdProvider {
                 .put("lpNumber", lpNumber)
                 .put("moTTestDate", DateUtils.formatHUTime(moTTestDate))
                 .put("kgLimit", kgLimit)
+                //.put("truckType", truckType.getName())
                 .put("available", available);
 
         return json;

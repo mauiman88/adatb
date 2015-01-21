@@ -1,0 +1,85 @@
+@()
+
+<div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ng-click="clearOrder()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 ng-if="selectedOrder.id != null" class="modal-title" id="myModalLabel">Megrendelés szerkesztése</h4>
+                <h4 ng-if="selectedOrder.id == null" class="modal-title" id="myModalLabel">Megrendelés hozzáadása</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" ng-submit="saveOrder()">
+
+                        <div class="form-group" ng-if="isShipped(selectedOrder) && selectedOrder.deliveredValue != true">
+                            <div class="col-sm-offset-3 col-sm-8">
+
+                                <label>
+                                    <input type="checkbox"  ng-model="selectedOrder.delivered"> Megérkezett a termék?
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-if="isShipped(selectedOrder) && selectedOrder.deliveredValue != true">
+                            <label for="selectedOrder.feedbackMsg" class="col-sm-3 control-label">Visszajelzés</label>
+                            <div class="col-sm-8">
+                                <textarea class="text-area" ng-model="selectedOrder.feedbackMsg" placeholder="Visszajelzés..."></textarea>
+                            </div>
+                        </div>
+                        <div ng-if="isWaiting(selectedOrder)">
+                            <div class="form-group {{ errors.selectedDate ? 'has-error' : '' }}">
+                                <label for="selectedOrder.selectedDate" class="col-sm-3 control-label">Kiszállítás időpontja (YYYY-MM-DD)</label>
+                                <div class="col-sm-8">
+                                    <input id="selectedDate" type="text" class="form-control" ng-value="checkValid(selectedOrder.amount, selectedOrder.selectedDate)" ng-model="selectedOrder.selectedDate" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group {{ errors.amount ? 'has-error' : '' }}">
+                                <label for="selectedOrder.amount" class="col-sm-3 control-label">Összeg (Ft)</label>
+                                <div class="col-sm-8">
+                                    <input id="selectedDate" type="text" class="form-control" ng-value="checkValid(selectedOrder.amount, selectedOrder.selectedDate)" ng-model="selectedOrder.amount" disabled  >
+                                </div>
+                            </div>
+
+                            @helper.textInput("description", "text", "Megjegyzés", "selectedOrder.description", "errors.description", 3)
+                        </div>
+
+                    <label class="col-sm-offset-3 col-sm-8">Szállítási cím</label>
+                    @helper.addressInputs("selectedOrder.client.address.country", "selectedOrder.client.address.city",
+                        "selectedOrder.client.address.street", "selectedOrder.client.address.streetNumber", "selectedOrder.client.address")
+
+
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Termék tulajdonságok</div>
+                        <div class="panel-body">
+
+                            <div class="form-group {{ errors.productTypeId ? 'has-error':'' }}">
+                                <label for="productType" class="col-sm-3 control-label">Típus</label>
+                                <div class="col-sm-8">
+                                    <select id="productType" class="form-control needsclick" ng-model="selectedOrder.orderItem.productType" ng-options="productType.name for productType in productTypes">
+                                    </select>
+                                </div>
+                            </div>
+
+                            @helper.textInput("productName", "text", "Termék neve", "selectedOrder.orderItem.productName", "errors.productName", 3)
+
+                            @helper.textInput("weight", "number", "Termék súlya", "selectedOrder.orderItem.weight", "errors.weight", 3)
+
+                            <label class="col-sm-offset-3 col-sm-8">Csomag felvételi cím</label>
+                            @helper.addressInputs2("selectedOrder.orderItem.fromAddress.country", "selectedOrder.orderItem.fromAddress.city",
+                                "selectedOrder.orderItem.fromAddress.street", "selectedOrder.orderItem.fromAddress.streetNumber",
+                                "errors.countryIdFrom","errors.cityIdFrom","errors.streetFrom","errors.streetNumberFrom",
+                                "selectedOrder.orderItem.fromAddress")
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" ng-click="clearOrder()" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                            <button type="submit" ng-if="!isWaiting(selectedOrder)" class="btn btn-primary">Mentés</button>
+                            <button type="submit" ng-if="isWaiting(selectedOrder);" ng-click="selectState('@models.orders.Order.OrderState.VERIFIED.getName()');changeState()" class="btn btn-success">Jóváhagyás</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
