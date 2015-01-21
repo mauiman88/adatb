@@ -11,6 +11,15 @@
             <div class="modal-body">
                 <form class="form-horizontal" ng-submit="saveOrder()">
 
+                    @if(Application.getLocalUser.isAdmin) {
+                        <div class="form-group {{ errors.clientId ? 'has-error':'' }}">
+                            <label for="client" class="col-sm-3 control-label">Ügyfél</label>
+                            <div class="col-sm-8">
+                                <select id="client" class="form-control needsclick" ng-model="selectedOrder.client" ng-options="client.name for client in clients">
+                                </select>
+                            </div>
+                        </div>
+                    } else {
                         <div class="form-group" ng-if="isShipped(selectedOrder) && selectedOrder.deliveredValue != true">
                             <div class="col-sm-offset-3 col-sm-8">
 
@@ -42,6 +51,8 @@
 
                             @helper.textInput("description", "text", "Megjegyzés", "selectedOrder.description", "errors.description", 3)
                         </div>
+
+                    }
 
                     <label class="col-sm-offset-3 col-sm-8">Szállítási cím</label>
                     @helper.addressInputs("selectedOrder.client.address.country", "selectedOrder.client.address.city",
@@ -75,8 +86,12 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" ng-click="clearOrder()" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                        @if(!Application.getLocalUser.isAdmin) {
                             <button type="submit" ng-if="!isWaiting(selectedOrder)" class="btn btn-primary">Mentés</button>
                             <button type="submit" ng-if="isWaiting(selectedOrder);" ng-click="selectState('@models.orders.Order.OrderState.VERIFIED.getName()');changeState()" class="btn btn-success">Jóváhagyás</button>
+                        } else {
+                            <button type="submit" class="btn btn-primary">Mentés</button>
+                        }
                     </div>
                 </form>
             </div>

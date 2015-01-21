@@ -5,7 +5,8 @@
         controllers.routes.javascript.Orders.getOrders,
         controllers.routes.javascript.Orders.saveOrder,
         controllers.routes.javascript.Orders.changeState,
-        controllers.routes.javascript.Orders.sendOutOrder
+        controllers.routes.javascript.Orders.shippedOut,
+        controllers.routes.javascript.Orders.wfsOrder
     )
 
     <script type="application/javascript">
@@ -150,6 +151,9 @@
             };
 
 
+            $scope.isNew = function(order) {
+                return order.state == '@models.orders.Order.OrderState.NEW.getName()';
+            }
             $scope.isVerified = function(order) {
                 return order.state == '@models.orders.Order.OrderState.VERIFIED.getName()';
             }
@@ -255,4 +259,108 @@
         })
 
     </script>
+}
+
+@menubar("Megrendelések", scripts, activeMenu) {
+    <div ng-controller="OrderController">
+
+        <h1>Megrendelések</h1>
+        <hr>
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist" id="myTab">
+                <li role="presentation" class="active"><a href="#new" aria-controls="new" role="tab" data-toggle="tab">Új / Visszadobott</a></li>
+                <li role="presentation"><a href="#waiting" aria-controls="waiting" role="tab" data-toggle="tab">Ügyfélre váró</a></li>
+                <li role="presentation"><a href="#verified" aria-controls="verified" role="tab" data-toggle="tab">Ügyfél által jóváhagyott</a></li>
+                <li role="presentation"><a href="#wfs" aria-controls="wfs" role="tab" data-toggle="tab">Kiszállításra vár</a></li>
+                <li role="presentation"><a href="#shipped" aria-controls="shipped" role="tab" data-toggle="tab">Kiszállított</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade in active" id="new">
+                    <div ng-if="newOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
+                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
+                    @views.html.orders.ordersList.render("order in newOrders", true)
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="waiting">
+                    <div ng-if="waitingOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
+                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
+                    <div ng-if="waitingOrders.length != 0">
+                        @views.html.orders.ordersList.render("order in waitingOrders", false)
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="verified">
+                    <div ng-if="verifiedOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
+                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
+                    <div ng-if="verifiedOrders.length != 0">
+                        @views.html.orders.ordersList.render("order in verifiedOrders", false)
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="wfs">
+                    <div ng-if="wfsTrans.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
+                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
+                    <div ng-if="wfsTrans.length != 0">
+                        @views.html.orders.transportList.render("t in wfsTrans", true)
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="shipped">
+                    <div ng-if="shippedOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
+                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
+                    <div ng-if="shippedOrders.length != 0">
+                        @views.html.orders.transportList.render("t in shippedOrders", false)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @views.html.orders.orderModal.render()
+        @helper.confirmationModal.render("changeState()", "Biztosan megváltoztattja a kiválasztott megrendelés státuszát?")
+        <div class="modal fade" id="wfsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 ng-if="selectedOrder.id != null" class="modal-title" id="myModalLabel">Kiszállításra átadás</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-horizontal" ng-submit="wfsOrder()">
+
+                            <div class="form-group">
+                                <label for="date" class="col-sm-3 control-label">Választott időpont</label>
+                                <div class="col-sm-8">
+                                    <input id="date" type="text" class="form-control" ng-model="selectedOrder.selectedDate" disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group {{ errors.driverId ? 'has-error':'' }}">
+                                <label for="driver" class="col-sm-3 control-label">Sofőr</label>
+                                <div class="col-sm-8">
+                                    <select id="driver" class="form-control needsclick" ng-model="selectedOrder.transport" ng-options="t.driver.name for t in transporters">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group {{ errors.truckId ? 'has-error':'' }}">
+                                <label for="truck" class="col-sm-3 control-label">Gépjármű</label>
+                                <div class="col-sm-8">
+                                    <select id="truck" class="form-control needsclick" ng-model="selectedOrder.truck" ng-options="truck.lpNumber for truck in selectedOrder.transport.trucks">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <span style="text-align:center;color:red" ng-repeat="error in errors.transport">
+                                <i class="fa fa-exclamation-triangle"></i> {{error}}</span>
+                            <div class="modal-footer">
+                                <button type="button" ng-click="clearOrder()" class="btn btn-default" data-dismiss="modal">Mégsem</button>
+                                <button type="submit" class="btn btn-primary">Mentés</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 }

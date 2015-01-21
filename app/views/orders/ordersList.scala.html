@@ -11,8 +11,10 @@
         <p class="list-group-item-text">{{order.orderItem.productName}}</p>
         <p class="list-group-item-text">{{order.state}}</p>
         <p class="list-group-item-text" ng-if="order.description != null"><i class="fa fa-exclamation-triangle"></i> {{order.description}}</p>
+        @if(Application.getLocalUser.isAdmin) {
           <input type="button" class="btn btn-primary pull-right" ng-click="selectOrder(order);selectState(state);" ng-if="state != order.state" value="Ok"/>
           <select style="width : 30%;margin-right:5px" class="form-control needsclick pull-right" ng-model="state" ng-options="s for s in states"></select>
+        }
         <button class="btn btn-primary" ng-click="selectOrder(order)" data-toggle="modal" data-target="#orderModal"><i class="fa fa-edit"></i> Szerkesztés</button>
 
         <button class="btn btn-default" ng-if="isNew(order)" ng-click="selectOrder(order)" data-toggle="modal" data-target="#sendOutModal">
