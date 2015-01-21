@@ -29,6 +29,7 @@ POST        /admin/orders/saveOrder            controllers.Orders.saveOrder()
 POST        /admin/orders/changeState          controllers.Orders.changeState()
 POST        /admin/orders/wfsOrder             controllers.Orders.wfsOrder()
 POST        /admin/orders/shippedOut           controllers.Orders.shippedOut()
+POST        /admin/orders/sendOutOrder         controllers.Orders.sendOutOrder()
 
 
 

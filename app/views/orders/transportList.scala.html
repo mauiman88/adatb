@@ -6,21 +6,17 @@
       <a class="list-group-item"  ng-repeat="@iteration">
         <div class="panel panel-default">
           <div class="panel-heading">
-            #{{$index}} {{t.date}} {{t.driver.name}} {{ t.truck.lpNumber }}
+            {{t.date}} {{t.driver.name}} {{ t.truck.lpNumber }}
             @if(shippedOut){
               <input type="button" class="btn btn-success pull-right panel-heading-button" value="Kiszállítva" ng-click="shippedOut(t.id)" >
               }
-                <input type="button" class="btn btn-primary pull-right panel-heading-button" value="Szállítólevél letöltése" ng-click="downloadPDF(t)">
           </div>
           <div class="panel-body">
             <div class="list-group" ng-repeat="ti in t.transportItems">
-              <h4 class="list-group-item-heading">{{ti.order.client.name}} <br /><small>{{ti.order.created}}</small></h4>
-              <h4 class="list-group-item-text">Választott időpont: <small>{{ti.order.selectedDate}}</small></h4>
-              <h4 class="list-group-item-text">Termék név: <small>{{ti.order.orderItem.productName}}</small></h4>
-              <h4 class="list-group-item-text">Termék tulajdonság: <small>{{ti.order.orderItem.productType.name}}</small></h4>
-              <h4 class="list-group-item-text" ng-if="isShipped(ti.order)">Jóváhagyva: <small>{{ti.order.delivered}}</small></h4>
-              <h4 class="list-group-item-text" ng-if="isShipped(ti.order) && ti.order.feedbackMsg!=null">Visszajelzés: <small>{{ti.order.feedbackMsg}}</small></h4>
-              <h4 class="list-group-item-text" ng-if="order.description != null"><i class="fa fa-exclamation-triangle"></i> {{ti.order.description}}</h4>
+              <h4 class="list-group-item-heading">{{t.client.name}} <br /></h4>
+              <h4 class="list-group-item-text">Választott időpont: <small>{{ti.date}}</small></h4>
+              <h4 class="list-group-item-text">Termék név: <small>{{ti.productName}}</small></h4>
+              <h4 class="list-group-item-text">Termék tulajdonság: <small>{{ti.productType.name}}</small></h4>
             </div>
           </div>
         </div>

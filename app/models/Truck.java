@@ -35,7 +35,7 @@ public class Truck extends EntityIdProvider {
     }
 
     @Enumerated(EnumType.STRING)
-    public TruckType truckType= TruckType.MEDIUM;
+    public TruckType truckType = TruckType.MEDIUM;
 
     public Long kgLimit; //kg limit
 

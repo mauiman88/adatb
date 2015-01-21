@@ -21,7 +21,7 @@ import java.util.List;
 public class Order extends EntityIdProvider{
 
     public static enum OrderState {
-        NEW("Új"),VERIFIED("Jóváhagyva"), WAITING_FOR_SHIPPING("Kiszállításra vár"), SHIPPED("Kiszállítva");
+        NEW("Új"),VERIFIED("Jóváhagyva"), DONE("Done");
 
         private final String name;
 

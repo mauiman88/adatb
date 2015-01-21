@@ -6,6 +6,7 @@
         controllers.routes.javascript.Orders.saveOrder,
         controllers.routes.javascript.Orders.changeState,
         controllers.routes.javascript.Orders.shippedOut,
+        controllers.routes.javascript.Orders.sendOutOrder,
         controllers.routes.javascript.Orders.wfsOrder
     )
 
@@ -20,13 +21,14 @@
                     success: function(data) {
                         $scope.$apply(function(){
                             $scope.newOrders = data.new;
-                            $scope.waitingOrders = data.waiting;
                             $scope.verifiedOrders = data.verified;
-                            $scope.shippedOrders = data.shipped;
                             $scope.wfsTrans = data.wfs;
+                            $scope.shippedOrders = data.shipped;
                             $scope.clients = data.clients;
                             $scope.productTypes = data.productTypes;
                             $scope.transporters = data.transporters;
+                            $scope.drivers = data.drivers;
+                            $scope.trucks = data.trucks;
                         })
                     }
                 })
@@ -101,8 +103,7 @@
 
             $scope.fillStates = function() {
                 $scope.states =['@models.orders.Order.OrderState.NEW.getName()',
-                                '@models.orders.Order.OrderState.VERIFIED.getName()',
-                                '@models.orders.Order.OrderState.SHIPPED.getName()'];
+                                '@models.orders.Order.OrderState.VERIFIED.getName()'];
                 $scope.state = $scope.states[0];
             };
             $scope.fillStates();
@@ -137,10 +138,10 @@
             $scope.isVerified = function(order) {
                 return order.state == '@models.orders.Order.OrderState.VERIFIED.getName()';
             }
-            $scope.isShipped = function(order) {
-                if(order != null) return order.state == '@models.orders.Order.OrderState.SHIPPED.getName()';
 
-            };
+            $scope.sendOut = function() {
+                $('#sendOutModal').modal('show');
+            }
 
             $scope.changeState = function() {
                 console.log($scope.selectedOrder);
@@ -199,7 +200,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({
                         id: $scope.selectedOrder.id,
-                        driverId: $scope.selectedOrder.transport.driver.id,
+                        driverId: $scope.selectedOrder.transport.id,
                         truckId: $scope.selectedOrder.truck.id
                     }),
                     success: function(data) {
@@ -240,6 +241,10 @@
             $scope.openOrderModal = function() {
                 $('#orderModal' ).modal('show');
             }
+
+            $scope.openWfs = function() {
+                $('#wfsModal' ).modal('show');
+            }
         })
 
     </script>
@@ -252,9 +257,8 @@
         <hr>
         <div role="tabpanel">
             <ul class="nav nav-tabs" role="tablist" id="myTab">
-                <li role="presentation" class="active"><a href="#new" aria-controls="new" role="tab" data-toggle="tab">Új / Visszadobott</a></li>
-                <li role="presentation"><a href="#waiting" aria-controls="waiting" role="tab" data-toggle="tab">Ügyfélre váró</a></li>
-                <li role="presentation"><a href="#verified" aria-controls="verified" role="tab" data-toggle="tab">Ügyfél által jóváhagyott</a></li>
+                <li role="presentation" class="active"><a href="#new" aria-controls="new" role="tab" data-toggle="tab">Új</a></li>
+                <li role="presentation"><a href="#verified" aria-controls="verified" role="tab" data-toggle="tab">Jóváhagyott</a></li>
                 <li role="presentation"><a href="#wfs" aria-controls="wfs" role="tab" data-toggle="tab">Kiszállításra vár</a></li>
                 <li role="presentation"><a href="#shipped" aria-controls="shipped" role="tab" data-toggle="tab">Kiszállított</a></li>
             </ul>
@@ -264,14 +268,6 @@
                     <div ng-if="newOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
                         <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
                     @views.html.orders.ordersList.render("order in newOrders", true)
-                </div>
-
-                <div role="tabpanel" class="tab-pane fade" id="waiting">
-                    <div ng-if="waitingOrders.length == 0" style="text-align: center; margin-top:10px; font-style: italic; color:red;">
-                        <i class="fa fa-exclamation-triangle"></i> A lista üres</div>
-                    <div ng-if="waitingOrders.length != 0">
-                        @views.html.orders.ordersList.render("order in waitingOrders", false)
-                    </div>
                 </div>
 
                 <div role="tabpanel" class="tab-pane fade" id="verified">
@@ -322,14 +318,14 @@
                             <div class="form-group {{ errors.driverId ? 'has-error':'' }}">
                                 <label for="driver" class="col-sm-3 control-label">Sofőr</label>
                                 <div class="col-sm-8">
-                                    <select id="driver" class="form-control needsclick" ng-model="selectedOrder.transport" ng-options="t.driver.name for t in transporters">
+                                    <select id="driver" class="form-control needsclick" ng-model="selectedOrder.transport" ng-options="d.name for d in drivers">
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group {{ errors.truckId ? 'has-error':'' }}">
                                 <label for="truck" class="col-sm-3 control-label">Gépjármű</label>
                                 <div class="col-sm-8">
-                                    <select id="truck" class="form-control needsclick" ng-model="selectedOrder.truck" ng-options="truck.lpNumber for truck in selectedOrder.transport.trucks">
+                                    <select id="truck" class="form-control needsclick" ng-model="selectedOrder.truck" ng-options="truck.lpNumber for truck in trucks">
                                     </select>
                                 </div>
                             </div>

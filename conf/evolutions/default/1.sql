@@ -42,13 +42,13 @@ create table orders (
   address                   varchar(255),
   client_id                 bigint,
   order_item_id             bigint,
-  order_state               varchar(20),
+  order_state               varchar(8),
   selected_date             timestamp,
   amount                    decimal(15,4),
   description               varchar(255),
   feedback_msg              varchar(255),
   delivered                 boolean,
-  constraint ck_orders_order_state check (order_state in ('NEW','VERIFIED','WAITING_FOR_SHIPPING','SHIPPED')),
+  constraint ck_orders_order_state check (order_state in ('NEW','VERIFIED','DONE')),
   constraint pk_orders primary key (id))
 ;
 
@@ -56,8 +56,11 @@ create table transport (
   id                        bigint not null,
   date                      timestamp,
   driver_id                 bigint,
+  client_id                 bigint,
   truck_id                  bigint,
   distance                  decimal(15,4),
+  transport_state           varchar(20),
+  constraint ck_transport_transport_state check (transport_state in ('WAITING_FOR_SHIPPING','SHIPPED')),
   constraint pk_transport primary key (id))
 ;
 
@@ -110,10 +113,12 @@ alter table orders add constraint fk_orders_orderItem_2 foreign key (order_item_
 create index ix_orders_orderItem_2 on orders (order_item_id);
 alter table transport add constraint fk_transport_driver_3 foreign key (driver_id) references driver (id);
 create index ix_transport_driver_3 on transport (driver_id);
-alter table transport add constraint fk_transport_truck_4 foreign key (truck_id) references truck (id);
-create index ix_transport_truck_4 on transport (truck_id);
-alter table users add constraint fk_users_client_5 foreign key (client_id) references client (id);
-create index ix_users_client_5 on users (client_id);
+alter table transport add constraint fk_transport_client_4 foreign key (client_id) references client (id);
+create index ix_transport_client_4 on transport (client_id);
+alter table transport add constraint fk_transport_truck_5 foreign key (truck_id) references truck (id);
+create index ix_transport_truck_5 on transport (truck_id);
+alter table users add constraint fk_users_client_6 foreign key (client_id) references client (id);
+create index ix_users_client_6 on users (client_id);
 
 
 

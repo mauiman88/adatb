@@ -15,11 +15,11 @@
           <input type="button" class="btn btn-primary pull-right" ng-click="selectOrder(order);selectState(state);" ng-if="state != order.state" value="Ok"/>
           <select style="width : 30%;margin-right:5px" class="form-control needsclick pull-right" ng-model="state" ng-options="s for s in states"></select>
         }
-        <button class="btn btn-primary" ng-click="selectOrder(order)" data-toggle="modal" data-target="#orderModal"><i class="fa fa-edit"></i> Szerkesztés</button>
+        <!--<button class="btn btn-primary" ng-click="selectOrder(order)" data-toggle="modal" data-target="#orderModal"><i class="fa fa-edit"></i> Szerkesztés</button>-->
 
-        <button class="btn btn-default" ng-if="isNew(order)" ng-click="selectOrder(order)" data-toggle="modal" data-target="#sendOutModal">
-                      <i class="fa fa-chevron-right"></i> Ügyfélre váró</button>
-        <button class="btn btn-default" ng-if="isVerified(order)" ng-click="selectOrder(order);" data-toggle="modal" data-target="#wfsModal">
+        <button class="btn btn-primary" ng-if="isNew(order)" ng-click="selectOrder(order);sendOut()" >
+                      <i class="fa fa-chevron-right"></i> Jóváhagyás</button>
+        <button class="btn btn-default" ng-if="isVerified(order)" ng-click="selectOrder(order);openWfs()">
                       <i class="fa fa-chevron-right"></i> Kiszállításra vár</button>
       </a>
     </div>

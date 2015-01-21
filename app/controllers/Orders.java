@@ -107,11 +107,10 @@ public class Orders extends Controller {
         ObjectNode json = Json.newObject();
         User user = Application.getLocalUser();
         if(user.client == null) {
-
                 json.put("new", JsonUtils.newArrayNode(Order.queryOrdersByState(Order.OrderState.NEW).stream().map(order -> order.toJson()).collect(Collectors.toList())));
-            json.put("verified", JsonUtils.newArrayNode(Order.queryOrdersByState((Order.OrderState.VERIFIED)).stream().map(order -> order.toJson()).collect(Collectors.toList())));
-            //json.put("wfs", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.WAITING_FOR_SHIPPING).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
-            //json.put("shipped", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Order.OrderState.SHIPPED).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
+                json.put("verified", JsonUtils.newArrayNode(Order.queryOrdersByState((Order.OrderState.VERIFIED)).stream().map(order -> order.toJson()).collect(Collectors.toList())));
+                json.put("wfs", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Transport.TransportState.WAITING_FOR_SHIPPING).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
+                json.put("shipped", JsonUtils.newArrayNode(Transport.getOrdersTransportsByState(Transport.TransportState.SHIPPED).stream().map(transport -> transport.toJson()).collect(Collectors.toList())));
         } else {
             json.put("list", JsonUtils.newArrayNode(Order.queryClientOrders(user.client.id)
                     .stream().map(Order::toJson).collect(Collectors.toList())));
@@ -119,6 +118,8 @@ public class Orders extends Controller {
         }
         json.put("clients", JsonUtils.newArrayNode(Client.all().stream().map(client -> client.toJson()).collect(Collectors.toList())));
         json.put("productTypes", Item.ProductType.productTypesAsJson());
+        json.put("drivers",JsonUtils.newArrayNode(Driver.all().stream().map(driver -> driver.toJson()).collect(Collectors.toList())));
+        json.put("trucks",JsonUtils.newArrayNode(Truck.all().stream().map(truck -> truck.toJson()).collect(Collectors.toList())));
         return ok(json);
     }
 
@@ -138,8 +139,6 @@ public class Orders extends Controller {
                 order.orderState = Order.OrderState.NEW;
             } else if(Order.OrderState.VERIFIED.getName().equals(stateStr)) {
                 order.orderState = Order.OrderState.VERIFIED;
-            } else if(Order.OrderState.SHIPPED.getName().equals(stateStr)) {
-                order.orderState = Order.OrderState.SHIPPED;
             }
             order.save();
             return ok();
@@ -204,18 +203,20 @@ public class Orders extends Controller {
 
         WfsForm form = wfsForm.get();
         Transport transport;
-      /*  if(Transport.isAvailable(new DateTime(form.order.selectedDate).plusHours(6).toDate(), form.driver, form.truck, form.order.orderItem.weight) == null) {
+        //if(Transport.isAvailable(new DateTime(form.order.selectedDate).plusHours(6).toDate(), form.driver, form.truck, form.order.orderItem.weight) == null) { //TODO - ellenőrzni hogy belefére a kocsiba
             transport = new Transport();
             transport.driver = form.driver;
             transport.truck = form.truck;
             transport.date = new DateTime(form.order.selectedDate).plusHours(6).toDate();
+            transport.transportItems.add(form.order.orderItem);
+            transport.transportState = Transport.TransportState.WAITING_FOR_SHIPPING;
+            transport.client = form.order.client;
             transport.save();
-        } else {
             transport = Ebean.find(Transport.class).where().eq("date", new DateTime(form.order.selectedDate).plusHours(6).toDate()).eq("driver", form.driver).eq("truck", form.truck).findUnique();
-        }
+        /*}
         TransportItem.createAndSave(form.order, transport, transport.transportItems.size()+1);
-*/
-        form.order.orderState = Order.OrderState.WAITING_FOR_SHIPPING;
+        */
+        form.order.orderState = Order.OrderState.DONE;
         form.order.save();
 
         return ok();
@@ -226,10 +227,42 @@ public class Orders extends Controller {
         String id = form.get("transportId");
         if(StringUtils.isEmpty(id)) return forbidden();
         Transport transport = Ebean.find(Transport.class).where().eq("id", Long.parseLong(id)).findUnique();
-       /* for (TransportItem ti : transport.transportItems) {
-            ti.order.orderState = Order.OrderState.SHIPPED;
-            ti.order.save();
-        }*/
+        transport.transportState = Transport.TransportState.SHIPPED;
+        transport.save();
         return ok();
+    }
+
+    public static Result sendOutOrder() {
+        DynamicForm form = DynamicForm.form().bindFromRequest(request());
+        String dateStr = form.get("selectedDate");
+        String orderIdStr = form.get("orderId");
+        String amountStr = form.get("amount");
+
+        boolean hasError = false;
+        if(StringUtils.isEmpty(dateStr) || new Date().compareTo(new DateTime(dateStr).toDate()) == 1) {
+            form.reject(new ValidationError("selectedDate", "error.required"));
+            hasError = true;
+        }
+        if(StringUtils.isEmpty(amountStr)) {
+            form.reject(new ValidationError("amount", "error.required"));
+            hasError = true;
+        }
+        if(hasError) {
+            return badRequest(form.errorsAsJson());
+        }
+
+        if(!StringUtils.isEmpty(orderIdStr)) {
+            Order order = Ebean.find(Order.class).where().eq("id", Long.parseLong(orderIdStr)).findUnique();
+            if (order == null) {
+                return forbidden();
+            }
+
+            order.orderState = Order.OrderState.VERIFIED;
+            order.selectedDate = DateUtils.formatToDateFromYear(dateStr);
+            order.amount = new BigDecimal(amountStr);
+            order.save();
+            return ok();
+        }
+        return badRequest();
     }
 }
